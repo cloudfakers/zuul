@@ -26,6 +26,13 @@ If you want to install it in your system, you can do it as usual. It will be ins
     make install                       # Installs Zuul in /usr/local
     make install PREFIX=<install dir>  # Installs Zuul in <install dir>
 
+Running
+-------
+
+You can run Zuul as follows, to let the bot join the specified channel.
+
+    ./zuul <irc server> <irc port> <nickname> <channel> [<channel password>]
+
 License
 -------
 

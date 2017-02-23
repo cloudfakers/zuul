@@ -90,7 +90,7 @@ void open_door(MessageEvent* event) {
 }
 
 int main(int argc, char **argv) {
-    char *irc_server, *irc_port, *irc_nick, *irc_channel;
+    char *irc_server, *irc_port, *irc_nick, *irc_channel, *irc_channel_pass = NULL;
 
     if (argc < 4) {
         printf("Usage: %s <irc server> <irc port> <nickname> <channel>\n", argv[0]);
@@ -101,13 +101,22 @@ int main(int argc, char **argv) {
     irc_port = argv[2];
     irc_nick = argv[3];
     irc_channel = argv[4];
+    if (argc > 4) {
+        irc_channel_pass = argv[5];
+    }
 
     irc_bind_event(ERR_NICKNAMEINUSE, (Callback) on_nick_in_use);
     irc_bind_command("puerta!", (Callback) open_door);
 
     irc_connect(irc_server, irc_port);
     irc_login(irc_nick, "Zuul", "Abiquo gatekeeper");
-    irc_join(irc_channel);
+
+    if (irc_channel_pass != NULL) {
+        irc_join_pass(irc_channel, irc_channel_pass);
+    } else {
+        irc_join(irc_channel);
+    }
+
     irc_listen();
 
     irc_quit("Bye");
