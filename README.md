@@ -1,8 +1,10 @@
 Zuul: The Abiquo Gatekeeper
 ===========================
 
-Zuul is a small IRC bot to control the door so we can just keep
-doing our shit when someone rings.
+Zuul is a small IRC bot used to open the office door. It runs on a Raspberry Pi
+and sends a signal to the appropriate GPIO pin when the "open door" command is
+issued. This way wa can keep working on our shit without having to traverse the
+office everytime someone rings.
 
 The C code to access the GPIO registers is inspired by:
 http://elinux.org/RPi_GPIO_Code_Samples
@@ -10,8 +12,8 @@ http://elinux.org/RPi_GPIO_Code_Samples
 Prerequisites
 -------------
 
-The IRC bot is implemented using [Circus](https://github.com/nacx/circus). It needs to
-be compiled and installed before building Zuul.
+The IRC bot is implemented using the [Circus](https://github.com/nacx/circus) frametowk.
+You can download and install it followign the instructions in its README.
 
 Compiling
 ---------
@@ -29,7 +31,8 @@ If you want to install it in your system, you can do it as usual. It will be ins
 Running
 -------
 
-You can run Zuul as follows, to let the bot join the specified channel.
+You can run Zuul as follows, to let the bot join the specified channel. If the channel is password
+protected, you can also provide the password as an additional argumen.
 
     ./zuul <irc server> <irc port> <nickname> <channel> [<channel password>]
 

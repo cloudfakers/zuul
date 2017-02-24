@@ -16,6 +16,11 @@
 
 #define _POSIX_C_SOURCE 200112L
 
+/*
+ * GPIO code by Gert van Loo & Dom:
+ * http://elinux.org/RPi_GPIO_Code_Samples
+ */
+
 /* For Raspberry Pi 2 and Pi 3, change to 0x3F000000 */
 #define BCM2708_PERI_BASE 0x20000000
 #define GPIO_BASE (BCM2708_PERI_BASE + 0x200000) /* GPIO controller */
@@ -109,7 +114,7 @@ int main(int argc, char **argv) {
     irc_bind_command("puerta!", (Callback) open_door);
 
     irc_connect(irc_server, irc_port);
-    irc_login(irc_nick, "Zuul", "Abiquo gatekeeper");
+    irc_login(irc_nick, "Zuul", "Abiquo Gatekeeper");
 
     if (irc_channel_pass != NULL) {
         irc_join_pass(irc_channel, irc_channel_pass);
