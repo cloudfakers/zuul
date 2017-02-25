@@ -19,7 +19,7 @@ LN = $(CC)
 PREFIX ?= /usr/local
 
 CFLAGS = -pipe -O2 -Wall -ansi -pedantic
-LDFLAGS = -lcircus -lpthread
+LDFLAGS = -lcircus -lpthread -lwiringPi
 
 
 all: $(TARGETS)
