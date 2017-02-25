@@ -6,14 +6,12 @@ and sends a signal to the appropriate GPIO pin when the "open door" command is
 issued. This way wa can keep working on our shit without having to traverse the
 office everytime someone rings.
 
-The C code to access the GPIO registers is inspired by:
-http://elinux.org/RPi_GPIO_Code_Samples
-
 Prerequisites
 -------------
 
-The IRC bot is implemented using the [Circus](https://github.com/nacx/circus) frametowk.
-You can download and install it followign the instructions in its README.
+The IRC bot is implemented using the [Circus](https://github.com/nacx/circus) framework. You can download and install it followign the instructions in its README.
+
+It also uses [WiringPi](http://wiringpi.com/download-and-install/). You can also download and install it following the instructions on its site.
 
 Compiling
 ---------
