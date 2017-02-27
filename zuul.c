@@ -40,7 +40,7 @@ void open_door(MessageEvent* event) {
     
     /* Configure the GPIO pins to open the door */
     digitalWrite(GPIO_PIN, HIGH);
-    delay(1000);
+    delay(500);
     digitalWrite(GPIO_PIN, LOW);
 }
 
