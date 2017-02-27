@@ -16,7 +16,11 @@
 
 #define _POSIX_C_SOURCE 200112L
 
-#define GPIO_PIN 3  /* BCM_GPIO pin 22 */
+#define GPIO_PIN 9
+
+/* We just connected the wires this way... ABiquo style! */
+#define GPIO_ON 0
+#define GPIO_OFF 1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,10 +42,9 @@ void open_door(MessageEvent* event) {
     /* Tell Fari to stream the webcam */
     irc_message("elfari", "afuego http://zuul.bcn.abiquo.com:8080/?action=stream");
     
-    /* Configure the GPIO pins to open the door */
-    digitalWrite(GPIO_PIN, HIGH);
+    digitalWrite(GPIO_PIN, GPIO_ON);
     delay(500);
-    digitalWrite(GPIO_PIN, LOW);
+    digitalWrite(GPIO_PIN, GPIO_OFF);
 }
 
 /* Initialize the GPIO system */
@@ -51,6 +54,7 @@ void init_gpio() {
         exit(EXIT_FAILURE);
     }
     pinMode(GPIO_PIN, OUTPUT);
+    digitalWrite(GPIO_PIN, GPIO_OFF);
 }
 
 int main(int argc, char **argv) {
@@ -60,6 +64,8 @@ int main(int argc, char **argv) {
         printf("Usage: %s <irc server> <irc port> <nickname> <channel>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+
+    init_gpio();
 
     irc_server = argv[1];
     irc_port = argv[2];
