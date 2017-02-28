@@ -38,3 +38,6 @@ uninstall:
 clean:
 	rm -f *.o
 	rm -f $(TARGETS)
+
+.PHONY:
+	install uninstall clean

@@ -18,7 +18,7 @@
 
 #define GPIO_PIN 9
 
-/* We just connected the wires this way... ABiquo style! */
+/* We just connected the wires this way... Abiquo style! */
 #define GPIO_ON 0
 #define GPIO_OFF 1
 
