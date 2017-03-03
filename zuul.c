@@ -57,7 +57,8 @@ void init_gpio() {
 }
 
 int main(int argc, char **argv) {
-    char *irc_server, *irc_port, *irc_nick, *irc_channel, *irc_channel_pass = NULL;
+    char irc_channel[20];
+    char *irc_server, *irc_port, *irc_nick, *irc_channel_pass = NULL;
 
     if (argc < 4) {
         printf("Usage: %s <irc server> <irc port> <nickname> <channel>\n", argv[0]);
@@ -69,7 +70,7 @@ int main(int argc, char **argv) {
     irc_server = argv[1];
     irc_port = argv[2];
     irc_nick = argv[3];
-    irc_channel = argv[4];
+    snprintf(irc_channel, sizeof irc_channel, "#%s", argv[4]);
     if (argc > 4) {
         irc_channel_pass = argv[5];
     }
@@ -79,6 +80,7 @@ int main(int argc, char **argv) {
 
     irc_connect(irc_server, irc_port);
     irc_login(irc_nick, "Zuul", "Abiquo Gatekeeper");
+
 
     if (irc_channel_pass != NULL) {
         irc_join_pass(irc_channel, irc_channel_pass);
