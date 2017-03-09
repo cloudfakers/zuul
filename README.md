@@ -6,6 +6,8 @@ and sends a signal to the appropriate GPIO pin when the "open door" command is
 issued. This way wa can keep working on our shit without having to traverse the
 office everytime someone rings.
 
+![raspberry](img/zuul-raspberry.jpg) ![cam](img/zuul-cam.jpg) ![door](img/zuul-door.jpg)
+
 Prerequisites
 -------------
 
