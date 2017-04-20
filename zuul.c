@@ -41,19 +41,6 @@ void on_nick_in_use(ErrorEvent* event) {
     exit(EXIT_FAILURE);
 }
 
-/* IRC callback to open the door */
-void open_door(MessageEvent* event) {
-    irc_message(event->to, "Vamos esa puertaaaaaa!!!!");
-    irc_message(event->to, "afuego http://zuul.bcn.abiquo.com:8080/?action=stream");
-    
-    digitalWrite(GPIO_PIN, GPIO_ON);
-    delay(500);
-    digitalWrite(GPIO_PIN, GPIO_OFF);
-
-    delay(3000);
-    play_sound(event);
-}
-
 /* Initialize the GPIO system */
 void init_gpio() {
     if (wiringPiSetup() == -1) {
@@ -64,6 +51,7 @@ void init_gpio() {
     digitalWrite(GPIO_PIN, GPIO_OFF);
 }
 
+/* Plays the configured sound file */
 void play_sound(MessageEvent* event) {
     mpg123_handle *mh;
     unsigned char *buffer;
@@ -105,6 +93,19 @@ void play_sound(MessageEvent* event) {
     mpg123_delete(mh);
     mpg123_exit();
     ao_shutdown();
+}
+
+/* IRC callback to open the door */
+void open_door(MessageEvent* event) {
+    irc_message(event->to, "Vamos esa puertaaaaaa!!!!");
+    irc_message(event->to, "afuego http://zuul.bcn.abiquo.com:8080/?action=stream");
+    
+    digitalWrite(GPIO_PIN, GPIO_ON);
+    delay(500);
+    digitalWrite(GPIO_PIN, GPIO_OFF);
+
+    delay(3000);
+    play_sound(event);
 }
 
 int main(int argc, char **argv) {
