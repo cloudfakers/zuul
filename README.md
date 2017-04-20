@@ -18,24 +18,11 @@ It also uses [WiringPi](http://wiringpi.com/download-and-install/). You can also
 Compiling
 ---------
 
-To compile Zuul, you can simply run:
+To compile and install Zuul, you can simply run:
 
     cmake .
     make
-
-If you want to install it in your system, you can do it as usual. It will be installed by default in
-/usr/local, but you can customize the installation directory by adding the *PREFIX* parameter:
-
-    make install                       # Installs Zuul in /usr/local
-    make install PREFIX=<install dir>  # Installs Zuul in <install dir>
-
-Running
--------
-
-You can run Zuul as follows, to let the bot join the specified channel. If the channel is password
-protected, you can also provide the password as an additional argumen.
-
-    ./zuul <irc server> <irc port> <nickname> <channel> [<channel password>]
+    make install   # Installs the zuul binary in /usr/local/bin
 
 License
 -------
