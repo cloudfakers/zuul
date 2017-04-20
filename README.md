@@ -20,6 +20,7 @@ Compiling
 
 To compile Zuul, you can simply run:
 
+    cmake .
     make
 
 If you want to install it in your system, you can do it as usual. It will be installed by default in

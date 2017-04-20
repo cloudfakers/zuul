@@ -24,8 +24,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <circus/irc.h>
 #include <wiringPi.h>
+#include <ao/ao.h>
+#include <mpg123.h>
+
+/* Audio file to play when the door is opened */
+char* audio_file;
 
 /* Disconnect if the nick is in use */
 void on_nick_in_use(ErrorEvent* event) {
@@ -43,6 +49,9 @@ void open_door(MessageEvent* event) {
     digitalWrite(GPIO_PIN, GPIO_ON);
     delay(500);
     digitalWrite(GPIO_PIN, GPIO_OFF);
+
+    delay(3000);
+    play_sound(event);
 }
 
 /* Initialize the GPIO system */
@@ -55,27 +64,77 @@ void init_gpio() {
     digitalWrite(GPIO_PIN, GPIO_OFF);
 }
 
+void play_sound(MessageEvent* event) {
+    mpg123_handle *mh;
+    unsigned char *buffer;
+    size_t buffer_size, done;
+    int err, driver, channels, encoding;
+    ao_device *dev;
+    ao_sample_format format;
+    long rate;
+    
+    /* initializations */
+    ao_initialize();
+    driver = ao_default_driver_id();
+    mpg123_init();
+    mh = mpg123_new(NULL, &err);
+    buffer_size = mpg123_outblock(mh);
+    buffer = (unsigned char*) malloc(buffer_size * sizeof(unsigned char));
+
+    /* open the file and get the decoding format */
+    mpg123_open(mh, audio_file);
+    mpg123_getformat(mh, &rate, &channels, &encoding);
+
+    /* set the output format and open the output device */
+    format.bits = mpg123_encsize(encoding) * 8;
+    format.rate = rate;
+    format.channels = channels;
+    format.byte_format = AO_FMT_NATIVE;
+    format.matrix = 0;
+    dev = ao_open_live(driver, &format, NULL);
+
+    /* decode and play */
+    while (mpg123_read(mh, buffer, buffer_size, &done) == MPG123_OK) {
+        ao_play(dev, buffer, done);
+    }
+
+    /* clean up */
+    free(buffer);
+    ao_close(dev);
+    mpg123_close(mh);
+    mpg123_delete(mh);
+    mpg123_exit();
+    ao_shutdown();
+}
+
 int main(int argc, char **argv) {
     char irc_channel[20];
     char *irc_server, *irc_port, *irc_nick, *irc_channel_pass = NULL;
 
-    if (argc < 4) {
-        printf("Usage: %s <irc server> <irc port> <nickname> <channel>\n", argv[0]);
+    if (argc < 6) {
+        printf("Usage: %s <audio file> <irc server> <irc port> <nickname> <channel>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
     init_gpio();
 
-    irc_server = argv[1];
-    irc_port = argv[2];
-    irc_nick = argv[3];
-    snprintf(irc_channel, sizeof irc_channel, "#%s", argv[4]);
-    if (argc > 4) {
-        irc_channel_pass = argv[5];
+    audio_file = argv[1];
+    if (access(audio_file, R_OK) == -1) {
+        printf("Audio file '%s' does not exist\n", audio_file);
+        exit(EXIT_FAILURE);
+    }
+
+    irc_server = argv[2];
+    irc_port = argv[3];
+    irc_nick = argv[4];
+    snprintf(irc_channel, sizeof irc_channel, "#%s", argv[5]);
+    if (argc > 5) {
+        irc_channel_pass = argv[6];
     }
 
     irc_bind_event(ERR_NICKNAMEINUSE, (Callback) on_nick_in_use);
     irc_bind_command("puerta!", (Callback) open_door);
+    irc_bind_command("palante!", (Callback) play_sound);
 
     irc_connect(irc_server, irc_port);
     irc_login(irc_nick, "Zuul", "Abiquo Gatekeeper");
