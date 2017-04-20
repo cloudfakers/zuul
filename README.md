@@ -11,14 +11,17 @@ office everytime someone rings.
 Prerequisites
 -------------
 
-The IRC bot is implemented using the [Circus](https://github.com/nacx/circus) framework. You can download and install it followign the instructions in its README.
+In order to build Zuul, you will need to install the following libraries:
 
-It also uses [WiringPi](http://wiringpi.com/download-and-install/). You can also download and install it following the instructions on its site.
+* **circus** - The IRC bot is implemented using the [Circus](https://github.com/nacx/circus) framework. You can download and install it followign the instructions in its README.
+* **wiringPi** - It uses [WiringPi](http://wiringpi.com/download-and-install/) to control the Raspberry Pi GPIO pins. You can also download and install it following the instructions on its site.
+* **mpg123** - Used to decode the audio file (mp3) that is played when the door is opened.
+* **ao** - Used to actually play the decoded audio file.
 
 Compiling
 ---------
 
-To compile and install Zuul, you can simply run:
+Once all the requirements are installed on the system, you can compile and install Zuul as follows:
 
     cmake .
     make
