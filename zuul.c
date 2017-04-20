@@ -104,7 +104,7 @@ void open_door(MessageEvent* event) {
     delay(500);
     digitalWrite(GPIO_PIN, GPIO_OFF);
 
-    delay(3000);
+    delay(4000);
     play_sound(event);
 }
 
