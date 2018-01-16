@@ -18,6 +18,8 @@ In order to build Zuul, you will need to install the following libraries:
 * **mpg123** - Used to decode the audio file (mp3) that is played when the door is opened.
 * **ao** - Used to actually play the decoded audio file.
 
+You will also need to install [eSpeak](http://espeak.sourceforge.net/) if you want to be able to use the text to speech features.
+
 Compiling
 ---------
 

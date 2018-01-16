@@ -108,6 +108,12 @@ void open_door(MessageEvent* event) {
     play_sound(event);*/
 }
 
+void say(MessageEvent* event) {
+    char command[250];
+    snprintf(command, sizeof(command), "espeak -ves+f4 -s150 \"%s\"", event->message);
+    system(command);
+}
+
 int main(int argc, char **argv) {
     char irc_channel[20];
     char *irc_server, *irc_port, *irc_nick, *irc_channel_pass = NULL;
@@ -136,6 +142,7 @@ int main(int argc, char **argv) {
     irc_bind_event(ERR_NICKNAMEINUSE, (Callback) on_nick_in_use);
     irc_bind_command("puerta!", (Callback) open_door);
     irc_bind_command("palante!", (Callback) play_sound);
+    irc_bind_command("zuul", (Callback) say);
 
     irc_connect(irc_server, irc_port);
     irc_login(irc_nick, "Zuul", "Abiquo Gatekeeper");
