@@ -1,7 +1,7 @@
 Zuul: The Abiquo Gatekeeper
 ===========================
 
-Zuul is a small IRC bot used to open the office door. It runs on a Raspberry Pi
+Zuul is a small API used to open the office door. It runs on a Raspberry Pi
 and sends a signal to the appropriate GPIO pin when the "open door" command is
 issued. This way wa can keep working on our shit without having to traverse the
 office everytime someone rings.
@@ -11,23 +11,18 @@ office everytime someone rings.
 Prerequisites
 -------------
 
-In order to build Zuul, you will need to install the following libraries:
-
-* **circus** - The IRC bot is implemented using the [Circus](https://github.com/nacx/circus) framework. You can download and install it followign the instructions in its README.
-* **wiringPi** - It uses [WiringPi](http://wiringpi.com/download-and-install/) to control the Raspberry Pi GPIO pins. You can also download and install it following the instructions on its site.
-* **mpg123** - Used to decode the audio file (mp3) that is played when the door is opened.
-* **ao** - Used to actually play the decoded audio file.
+Zuul is written in Go, so you'll need to have [Golang](https://golang.org/) installed and configured.
 
 You will also need to install [eSpeak](http://espeak.sourceforge.net/) if you want to be able to use the text to speech features.
 
 Compiling
 ---------
 
-Once all the requirements are installed on the system, you can compile and install Zuul as follows:
+Zuul can be compiled as follows:
 
-    cmake .
+    make deps      # Fetch project Go dependencies. Only required the first time
     make
-    make install   # Installs the zuul binary in /usr/local/bin
+    make install   # Installs the zuul binary in $(GOPATH)/bin
 
 License
 -------
