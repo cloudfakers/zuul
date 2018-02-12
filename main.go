@@ -35,35 +35,40 @@ import (
 	rpio "github.com/stianeikeland/go-rpio"
 )
 
-// DoorPin is the BCM number for the GPIO pin connected to the door
-const DoorPin = 3
+// Zuul is the Abiquo Gatekeeper that will take care of opening the door and welcoming
+// all the people that comes into the office
+type Zuul struct {
+	WelcomeFile string
+	DoorPin     int
+}
 
-// WelcomeFile is the file to play when the welcome command is invoked
-var WelcomeFile string
+// Init initializes the Zuul API and configures the HTTP routes for its commands
+func (z *Zuul) Init() (*mux.Router, error) {
+	if _, err := os.Stat(z.WelcomeFile); err != nil {
+		return nil, fmt.Errorf("could not open welcome audio file: %v", err)
+	}
+	if err := rpio.Open(); err != nil {
+		return nil, fmt.Errorf("error initializing GPIO system: %v", err)
+	}
 
-// Port is the port where the Zuul webserver listens
-var Port int
-
-// ConfigureRoutes sets up the routes of the Zuul API
-func ConfigureRoutes() *mux.Router {
 	router := mux.NewRouter()
-	router.HandleFunc("/puerta", Puerta)
-	router.HandleFunc("/palante", PlayWelcomeFile)
-	router.HandleFunc("/dimelo", Say).Methods("POST")
-	return router
+	router.HandleFunc("/puerta", z.Puerta)
+	router.HandleFunc("/palante", z.PlayWelcomeFile)
+	router.HandleFunc("/dimelo", z.Say).Methods("POST")
+	return router, nil
 }
 
 // Puerta handles the requests to open the door and configures the GPIO pin accordingly
-func Puerta(w http.ResponseWriter, r *http.Request) {
-	pin := rpio.Pin(DoorPin)
+func (z *Zuul) Puerta(w http.ResponseWriter, r *http.Request) {
+	pin := rpio.Pin(z.DoorPin)
 	pin.Low()
 	time.Sleep(500 * time.Millisecond)
 	pin.High()
 }
 
 // PlayWelcomeFile plays the welcome file in the speakers connected to the Raspberry Pi
-func PlayWelcomeFile(w http.ResponseWriter, r *http.Request) {
-	f, err := os.Open(WelcomeFile)
+func (z *Zuul) PlayWelcomeFile(w http.ResponseWriter, r *http.Request) {
+	f, err := os.Open(z.WelcomeFile)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	}
@@ -87,7 +92,7 @@ func PlayWelcomeFile(w http.ResponseWriter, r *http.Request) {
 }
 
 // Say plays the given audio text using the configured text to speech tool
-func Say(w http.ResponseWriter, r *http.Request) {
+func (z *Zuul) Say(w http.ResponseWriter, r *http.Request) {
 	text := r.PostFormValue("text")
 	cmd := exec.Command("espeak", "-ves+f4", "-s150", fmt.Sprintf("\"%v\"", text))
 	if err := cmd.Run(); err != nil {
@@ -95,33 +100,52 @@ func Say(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func main() {
-	flag.IntVar(&Port, "port", 7777, "Listen portt")
-	flag.StringVar(&WelcomeFile, "welcome-audio-file", "audio/palante.mp3", "Welcome Audio file")
-	flag.Parse()
+// APIServer is the HTTP server that will listen to Zuul commands
+type APIServer struct {
+	Address string
+	Port    int
+	router  *mux.Router
+	server  *http.Server
+}
 
-	if _, err := os.Stat(WelcomeFile); err != nil {
-		fmt.Printf("Could not open welcome audio file: %v\n", err)
-		os.Exit(1)
-	}
+// Init creates and initializes the API server with the given HTTP routes
+func (s *APIServer) Init(router *mux.Router) {
+	s.router = router
+	address := fmt.Sprintf("%v:%v", s.Address, s.Port)
+	s.server = &http.Server{Addr: address, Handler: s.router}
+}
 
-	// Initialize Raspberry GPIO
-	if err := rpio.Open(); err != nil {
-		fmt.Printf("Error initializing GPIO system: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
-
-	address := fmt.Sprintf("0.0.0.0:%v", Port)
-	router := ConfigureRoutes()
-	server := &http.Server{Addr: address, Handler: router}
-
-	log.Printf("Starting Zuul server at %v...\n", address)
-	go func() { log.Fatal(server.ListenAndServe()) }()
+// StartBackgroundAndWaitForSignal starts the HTTP server in the background and waits
+// until a SIGTERM signal is caught
+func (s *APIServer) StartBackgroundAndWaitForSignal() {
+	log.Printf("Starting Zuul server at %v:%v...\n", s.Address, s.Port)
+	go func() { log.Fatal(s.server.ListenAndServe()) }()
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	<-signalChan
+}
 
+// Shutdown attempts to gracefully shutdown the API HTTP server
+func (s *APIServer) Shutdown() {
 	log.Printf("Shutdown signal received. Shutting down gracefully...")
-	server.Shutdown(context.Background())
+	s.server.Shutdown(context.Background())
+}
+
+func main() {
+	zuul := &Zuul{DoorPin: 3}
+	server := &APIServer{Address: "0.0.0.0"}
+
+	flag.IntVar(&server.Port, "port", 7777, "Listen portt")
+	flag.StringVar(&zuul.WelcomeFile, "welcome-audio-file", "audio/palante.mp3", "Welcome Audio file")
+	flag.Parse()
+
+	router, err := zuul.Init()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	server.Init(router)
+	server.StartBackgroundAndWaitForSignal()
+	server.Shutdown()
 }
