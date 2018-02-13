@@ -1,8 +1,6 @@
 Zuul: The Abiquo Gatekeeper
 ===========================
 
-[![Build Status](https://travis-ci.org/cloudfakers/zuul.svg?branch=master)](https://travis-ci.org/cloudfakers/zuul)
-
 Zuul is a small API used to open the office door. It runs on a Raspberry Pi
 and sends a signal to the appropriate GPIO pin when the "open door" command is
 issued. This way wa can keep working on our shit without having to traverse the

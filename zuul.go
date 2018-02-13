@@ -97,7 +97,7 @@ func (z *Zuul) PlayWelcomeFile(w http.ResponseWriter, r *http.Request) {
 // Say plays the given audio text using the configured text to speech tool
 func (z *Zuul) Say(w http.ResponseWriter, r *http.Request) {
 	text := r.PostFormValue("text")
-	log.Printf("Received text so speak: %v", text)
+	log.Printf("Received text to speak: %v", text)
 	cmd := exec.Command("espeak", "-ves+f4", "-s150", fmt.Sprintf("\"%v\"", text))
 	if err := cmd.Run(); err != nil {
 		http.Error(w, err.Error(), 500)

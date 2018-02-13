@@ -1,5 +1,0 @@
-langauge: go
-go:
-    - 1.9
-go_import_path: github.com/cloudfakers/zuul
-before_script: make deps
