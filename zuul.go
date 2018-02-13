@@ -73,23 +73,27 @@ func (z *Zuul) PlayWelcomeFile(w http.ResponseWriter, r *http.Request) {
 	log.Println("Received welcome audio play request")
 	f, err := os.Open(z.WelcomeFile)
 	if err != nil {
+		log.Printf("Error opening audio file: %v\n", err)
 		http.Error(w, err.Error(), 500)
 	}
 	defer f.Close()
 
 	d, err := mp3.NewDecoder(f)
 	if err != nil {
+		log.Printf("Error decoding audio file: %v\n", err)
 		http.Error(w, err.Error(), 500)
 	}
 	defer d.Close()
 
 	p, err := oto.NewPlayer(d.SampleRate(), 2, 2, 8192)
 	if err != nil {
+		log.Printf("Error initializing audio player: %v\n", err)
 		http.Error(w, err.Error(), 500)
 	}
 	defer p.Close()
 
 	if _, err := io.Copy(p, d); err != nil {
+		log.Printf("Error playing audio file: %v\n", err)
 		http.Error(w, err.Error(), 500)
 	}
 }
@@ -100,6 +104,7 @@ func (z *Zuul) Say(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received text to speak: %v", text)
 	cmd := exec.Command("espeak", "-ves+f4", "-s150", fmt.Sprintf("\"%v\"", text))
 	if err := cmd.Run(); err != nil {
+		log.Printf("Error runnint text-to-peech command: %v\n", err)
 		http.Error(w, err.Error(), 500)
 	}
 }
