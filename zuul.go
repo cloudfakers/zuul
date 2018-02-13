@@ -43,9 +43,9 @@ func (z *Zuul) Init() (*mux.Router, error) {
 	if _, err := os.Stat(z.WelcomeFile); err != nil {
 		return nil, fmt.Errorf("could not open welcome audio file: %v", err)
 	}
-	// if err := rpio.Open(); err != nil {
-	// 	return nil, fmt.Errorf("error initializing GPIO system: %v", err)
-	// }
+	if err := rpio.Open(); err != nil {
+		return nil, fmt.Errorf("error initializing GPIO system: %v", err)
+	}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/puerta", z.Puerta)
