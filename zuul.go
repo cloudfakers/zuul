@@ -19,6 +19,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -42,9 +43,9 @@ func (z *Zuul) Init() (*mux.Router, error) {
 	if _, err := os.Stat(z.WelcomeFile); err != nil {
 		return nil, fmt.Errorf("could not open welcome audio file: %v", err)
 	}
-	if err := rpio.Open(); err != nil {
-		return nil, fmt.Errorf("error initializing GPIO system: %v", err)
-	}
+	// if err := rpio.Open(); err != nil {
+	// 	return nil, fmt.Errorf("error initializing GPIO system: %v", err)
+	// }
 
 	router := mux.NewRouter()
 	router.HandleFunc("/puerta", z.Puerta)
@@ -55,6 +56,7 @@ func (z *Zuul) Init() (*mux.Router, error) {
 
 // Puerta handles the requests to open the door and configures the GPIO pin accordingly
 func (z *Zuul) Puerta(w http.ResponseWriter, r *http.Request) {
+	log.Println("Received door open request")
 	pin := rpio.Pin(z.DoorPin)
 	pin.Low()
 	time.Sleep(500 * time.Millisecond)
@@ -63,6 +65,7 @@ func (z *Zuul) Puerta(w http.ResponseWriter, r *http.Request) {
 
 // PlayWelcomeFile plays the welcome file in the speakers connected to the Raspberry Pi
 func (z *Zuul) PlayWelcomeFile(w http.ResponseWriter, r *http.Request) {
+	log.Println("Received welcome audio play request")
 	f, err := os.Open(z.WelcomeFile)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -89,6 +92,7 @@ func (z *Zuul) PlayWelcomeFile(w http.ResponseWriter, r *http.Request) {
 // Say plays the given audio text using the configured text to speech tool
 func (z *Zuul) Say(w http.ResponseWriter, r *http.Request) {
 	text := r.PostFormValue("text")
+	log.Printf("Received text so speak: %v", text)
 	cmd := exec.Command("espeak", "-ves+f4", "-s150", fmt.Sprintf("\"%v\"", text))
 	if err := cmd.Run(); err != nil {
 		http.Error(w, err.Error(), 500)

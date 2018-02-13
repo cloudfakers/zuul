@@ -37,8 +37,7 @@ func main() {
 
 	router, err := zuul.Init()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	address := fmt.Sprintf("0.0.0.0:%v", port)
