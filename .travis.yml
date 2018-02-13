@@ -1,0 +1,4 @@
+langauge: go
+go:
+    - 1.9
+before_script: make deps
