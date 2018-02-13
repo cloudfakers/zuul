@@ -35,7 +35,8 @@ import (
 // all the people that comes into the office
 type Zuul struct {
 	WelcomeFile string
-	DoorPin     int
+	PinNumber   int
+	pin         rpio.Pin
 }
 
 // Init initializes the Zuul API and configures the HTTP routes for its commands
@@ -47,6 +48,11 @@ func (z *Zuul) Init() (*mux.Router, error) {
 		return nil, fmt.Errorf("error initializing GPIO system: %v", err)
 	}
 
+	// Initialize GPIO pin
+	z.pin = rpio.Pin(z.PinNumber)
+	z.pin.Output()
+
+	// Configure APi routes
 	router := mux.NewRouter()
 	router.HandleFunc("/puerta", z.Puerta)
 	router.HandleFunc("/palante", z.PlayWelcomeFile)
@@ -57,10 +63,9 @@ func (z *Zuul) Init() (*mux.Router, error) {
 // Puerta handles the requests to open the door and configures the GPIO pin accordingly
 func (z *Zuul) Puerta(w http.ResponseWriter, r *http.Request) {
 	log.Println("Received door open request")
-	pin := rpio.Pin(z.DoorPin)
-	pin.Low()
+	z.pin.Low()
 	time.Sleep(500 * time.Millisecond)
-	pin.High()
+	z.pin.High()
 }
 
 // PlayWelcomeFile plays the welcome file in the speakers connected to the Raspberry Pi
