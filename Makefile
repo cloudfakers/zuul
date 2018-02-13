@@ -25,9 +25,7 @@ uninstall:
 	@go clean -i -v
 
 deps:
-	go get github.com/gorilla/mux
-	go get github.com/stianeikeland/go-rpio
-	go get github.com/hajimehoshi/oto
-	go get github.com/hajimehoshi/go-mp3
+	@echo "Fetching dependencies..."
+	@go get -v ./...
 
-.PHONY: deps build
+.PHONY: deps build clean install uninstall
