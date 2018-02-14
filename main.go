@@ -33,7 +33,7 @@ func main() {
 	var port int
 	zuul := &Zuul{PinNumber: 3}
 
-	flag.IntVar(&port, "port", 7777, "Listen portt")
+	flag.IntVar(&port, "port", 7777, "Listen port")
 	flag.StringVar(&zuul.WelcomeFile, "welcome-audio-file", "audio/palante.mp3", "Welcome Audio file")
 	flag.Parse()
 
