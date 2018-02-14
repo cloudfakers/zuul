@@ -26,7 +26,7 @@ uninstall:
 
 deps:
 	@echo "Fetching dependencies..."
-	@go get -v github.com/tools/godep
+	@go get -v github.com/golang/dep/cmd/dep
 	@go get -v github.com/golang/lint/golint
 	@dep ensure -v
 
