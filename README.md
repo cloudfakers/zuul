@@ -24,7 +24,7 @@ Zuul can be compiled as follows:
 
     make deps      # Fetch project Go dependencies. Only required the first time
     make
-    make install   # Installs the zuul binary in $(GOPATH)/bin
+    make install   # (Optional) Installs the zuul binary in $(GOPATH)/bin
 
 License
 -------
