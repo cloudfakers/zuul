@@ -1,33 +1,38 @@
-BIN=zuul
+GOLINT := $(GOPATH)/bin/golint
+DEP := $(GOPATH)/bin/dep
 
-all: build
+TARGET := bin
+BINARY := zuul
 
-build:
-	@echo "Building Zuul..."
-	@go build -o $(BIN)
 
-	@echo "Running static code analysis..."
-	@go vet
+build: vendor $(GOLINT)
+	go build -o $(TARGET)/$(BINARY)
+	go vet
+	golint
 
-	@echo "Running Go style checks..."
-	@golint
-
-install:
-	@echo "Installing to $(GOPATH)/bin/$(BIN)..."
-	@go install
+install: build
+	go install
 
 clean:
-	@echo "Cleaning local builds..."
-	@go clean
+	go clean
+	rm -rf $(TARGET)
 
 uninstall:
-	@echo "Uninstalling from $(GOPATH)/bin..."
-	@go clean -i -v
+	go clean -i
 
-deps:
-	@echo "Fetching dependencies..."
-	@go get -v github.com/golang/dep/cmd/dep
-	@go get -v github.com/golang/lint/golint
-	@dep ensure -v
+$(GOLINT):
+	go get -v github.com/golang/lint/golint
 
-.PHONY: deps build clean install uninstall
+$(DEP):
+	go get -v github.com/golang/dep/cmd/dep
+
+vendor: $(DEP)
+	dep ensure -v
+
+linux:
+	GOOS=linux GOARCH=amd64 go build -o $(TARGET)/$(BINARY)-linux-amd64
+
+raspberry:
+	GOOS=linux GOARCH=arm GOARM=7 go build -o $(TARGET)/$(BINARY)-armv7
+
+.PHONY: build install clean uninstall linux raspberry
