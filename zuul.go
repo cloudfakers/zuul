@@ -51,6 +51,7 @@ func (z *Zuul) Init() (*mux.Router, error) {
 	// Initialize GPIO pin
 	z.pin = rpio.Pin(z.PinNumber)
 	z.pin.Output()
+	z.pin.High() // Make sure the door is closed when starting
 
 	// Configure APi routes
 	router := mux.NewRouter()
