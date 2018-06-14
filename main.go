@@ -26,7 +26,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	rpio "github.com/stianeikeland/go-rpio"
+	// rpio "github.com/stianeikeland/go-rpio"
 )
 
 func main() {
@@ -41,7 +41,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer rpio.Close()
+	// defer rpio.Close()
 
 	address := fmt.Sprintf("0.0.0.0:%v", port)
 	server := &http.Server{Addr: address, Handler: router}

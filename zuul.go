@@ -23,12 +23,12 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"time"
+	//"time"
 
 	"github.com/gorilla/mux"
 	mp3 "github.com/hajimehoshi/go-mp3"
 	"github.com/hajimehoshi/oto"
-	rpio "github.com/stianeikeland/go-rpio"
+	//rpio "github.com/stianeikeland/go-rpio"
 )
 
 // Zuul is the Abiquo Gatekeeper that will take care of opening the door and welcoming
@@ -36,7 +36,7 @@ import (
 type Zuul struct {
 	WelcomeFile string
 	PinNumber   int
-	pin         rpio.Pin
+//	pin         rpio.Pin
 }
 
 // Init initializes the Zuul API and configures the HTTP routes for its commands
@@ -44,30 +44,30 @@ func (z *Zuul) Init() (*mux.Router, error) {
 	if _, err := os.Stat(z.WelcomeFile); err != nil {
 		return nil, fmt.Errorf("could not open welcome audio file: %v", err)
 	}
-	if err := rpio.Open(); err != nil {
+	/*if err := rpio.Open(); err != nil {
 		return nil, fmt.Errorf("error initializing GPIO system: %v", err)
-	}
+	}*/
 
 	// Initialize GPIO pin
-	z.pin = rpio.Pin(z.PinNumber)
+/*	z.pin = rpio.Pin(z.PinNumber)
 	z.pin.Output()
 	z.pin.High() // Make sure the door is closed when starting
-
+*/
 	// Configure APi routes
 	router := mux.NewRouter()
-	router.HandleFunc("/puerta", z.Puerta)
+	//router.HandleFunc("/puerta", z.Puerta)
 	router.HandleFunc("/palante", z.PlayWelcomeFile)
 	router.HandleFunc("/dimelo", z.Say).Methods("POST")
 	return router, nil
 }
 
 // Puerta handles the requests to open the door and configures the GPIO pin accordingly
-func (z *Zuul) Puerta(w http.ResponseWriter, r *http.Request) {
+/*func (z *Zuul) Puerta(w http.ResponseWriter, r *http.Request) {
 	log.Println("Received door open request")
 	z.pin.Low()
 	time.Sleep(500 * time.Millisecond)
 	z.pin.High()
-}
+}*/
 
 // PlayWelcomeFile plays the welcome file in the speakers connected to the Raspberry Pi
 func (z *Zuul) PlayWelcomeFile(w http.ResponseWriter, r *http.Request) {
